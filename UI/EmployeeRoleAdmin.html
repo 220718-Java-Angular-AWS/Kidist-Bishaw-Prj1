@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Employee reimbursement page
+    </title>
+    <link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+    <div class="employee-reimbursement-form">
+        <form onsubmit="event.preventDefault();">
+            <div class="form-action-buttons">
+                <label id="empId"></label>
+                <select id="role" name="role">
+                    <option selected>Choose Employee Role </option>
+                    <option value="admin">Admin</option>
+                    <option value="user">User</option>
+                </select>
+                <input type="submit" onclick="updateRole()" value="Update">
+            </div>
+        </form>
+    </div>
+    <div class="employees-reimbursement-table">
+        <table class="list" id="empList">
+            <thead>
+                <tr>
+                    <th>EmployeeId</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="list">
+
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        //==========================================================================================================
+        var data = JSON.parse(localStorage.getItem('empDetail'));
+        var ourRequest = new XMLHttpRequest();
+
+        ourRequest.open('GET', `http://localhost:8080/ProjectOne/employees`)
+
+        ourRequest.onload = function () {
+            if (ourRequest.status >= 200 && ourRequest.status < 400) {
+
+                var ourData = JSON.parse(ourRequest.responseText);
+
+                buildTable(ourData);
+            } else {
+
+                console.log("We connected to the server, but it returned an error.");
+            }
+        };
+        ourRequest.onerror = function () {
+            console.log("Connection error");
+        };
+
+        ourRequest.send();
+        buildTable(ourRequest)
+
+        function buildTable(data) {
+            var table = document.getElementById("empList")
+            table.innerHTML = '';
+            for (var i = 0; i < data.length; i++) {
+                var row = `<tr>
+                                <td>${data[i].employeeId}</td>
+                                <td>${data[i].firstName}</td>
+                                <td>${data[i].lastName}</td>
+                                <td>${data[i].email}</td>
+                                <td>${data[i].role}</td>
+                                <td><a onClick="onEdit(this)">Edit</a></td>
+                          </tr>`
+                table.innerHTML += row
+            }
+        }
+        //======================================================================================================================
+
+
+        //========================================================================================================================
+        function onEdit(td) {
+            selectedRow = td.parentElement.parentElement;
+            document.getElementById("empId").innerHTML = selectedRow.cells[0].innerHTML;
+            ///document.getElementById("role").value = selectedRow.cells[5].innerHTML;
+        }
+
+        async function updateRole() {
+            let employee = {
+                empId: selectedRow.cells[0].innerHTML,
+                firstName: selectedRow.cells[1].innerHTML,
+                lastName: selectedRow.cells[2].innerHTML,
+                email: selectedRow.cells[3].innerHTML,
+                password: selectedRow.cells[4].innerHTML,
+                role: document.getElementById("role").value
+            }
+            console.log(employee.empId);
+            let url = `http://localhost:8080/ProjectOne/employees?emp_id=${employee.empId}`;
+            //let url = `http://localhost:8080/ProjectOne/employees`;
+            let response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json; charset=UTF-8'
+                },
+                body: JSON.stringify(employee)
+            });
+
+      if (response.status == 200) {
+                alert("Success!");
+                document.getElementById("empId").innerHTML = "";
+                var ourRequest = new XMLHttpRequest();
+
+                ourRequest.open('GET', `http://localhost:8080/ProjectOne/employees`)
+
+                ourRequest.onload = function () {
+                    if (ourRequest.status >= 200 && ourRequest.status < 400) {
+
+                        var ourData = JSON.parse(ourRequest.responseText);
+
+                        buildTable(ourData);
+                    } else {
+
+                        console.log("We connected to the server, but it returned an error.");
+                    }
+                };
+                ourRequest.onerror = function () {
+                    console.log("Connection error");
+                };
+
+                ourRequest.send();
+                buildTable(response);
+            }
+            else {
+                alert("Access denied! or Something went wrong...");
+            }
+        }
+    </script>
+</body>
+
+</html>

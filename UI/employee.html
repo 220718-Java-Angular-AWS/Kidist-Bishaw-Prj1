@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <link href="style.css" rel="stylesheet" />
+    <title>Employee Registration Form</title>
+
+</head>
+
+<body>
+    <div class="container">
+        <form class="register-form" autocomplete="off">
+            <div class="form-row"><input placeholder="First Name" id="firstName" type="text" required />
+            </div>
+            <div class="form-row"><input placeholder="Last Name" id="lastName" type="text" required />
+            </div>
+            <div class="form-row"><input placeholder="Email Address" id="email" type="text" required /></div>
+            <div class="form-row"><input placeholder="Password" id="password" type="password" required />
+            </div>
+            <div class="form-row"><button id="btn" type="submit"
+                    onclick="ValidateEmail(document.register-form.email);saveEmployee();">Register</button></div>
+            <div class="form-row">
+                <p class="message">Already registered? <a href="login.html">Sign In</a></p>
+            </div>
+        </form>
+    </div>
+    <script>
+
+        async function saveEmployee() {
+
+            let employee = {
+                firstName: document.getElementById("firstName").value,
+                lastName: document.getElementById("lastName").value,
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value
+                //role: document.getElementById("role").value,
+            }
+            let url = 'http://localhost:8080/ProjectOne/employees';
+            if (ValidateEmail(employee.email)) {
+                let response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json; charset=UTF-8'
+                    },
+                    body: JSON.stringify(employee)
+                });
+                if (response.status == 200)
+                    alert("Success!");
+                else
+                    alert("Something went wrong...");
+            }
+        }
+        function ValidateEmail(email) {
+            if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(document.getElementById("email").value)) {
+                return (true)
+            }
+            alert("You have entered an invalid email address!")
+            document.getElementById("email").focus();
+            return (false)
+        }
+    </script>
+</body>
+
+</html>

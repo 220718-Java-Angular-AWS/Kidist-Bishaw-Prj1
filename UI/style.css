@@ -1,0 +1,96 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+input {
+  font-size: 14px;
+  font-family: Helvetica, sans-serif;
+}
+
+body {
+  background-color: #BBB;
+  font-family: Helvetica, sans-serif;
+  padding-bottom: 100px;
+}
+
+h2, h3 {
+  margin: 0 0 .75em 0;
+}
+
+/* Login */
+.container {
+  max-width: 750px;
+  margin: 20px auto 0 auto;
+  padding: 30px;
+  background-color: #FFF;
+}
+
+.form-row {
+  padding: 10px 0;
+  display: flex;
+}
+
+.form-row button {
+  padding-right: 10px;
+  width: 100%;
+  font-size: 20px;
+  margin: auto;
+  flex 1
+}
+
+.form-row input {
+  flex: 1;
+}
+
+.form-row select {
+  flex 1;
+}
+
+.form-row radio {
+  flex 1;
+}
+
+/* Employee*/
+.empContainer {
+  margin: 20px auto 0 auto;
+  height: 400px;
+  padding: 30px;
+  max-width: 500px;
+  display: flex;
+}
+
+.reimbursement {
+  max-width: 750px;
+  margin: 20px auto 0 auto;
+  padding: 30px;
+  background-color: #FFF;
+}
+
+.btn {
+  color: #FFF;
+  font-size: 50px;
+  margin: auto;
+}
+
+.reimbursementLine {
+  flex: 1;
+}
+
+.reimbursement:nth-child(1) .reimbursementList {
+  max-width: 1400px;
+  margin: 40px auto 0 auto;
+  background-color: #FFF;
+  padding: 30px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.hide-me {
+  visibility: hidden;
+  opacity: 0;
+  transform: scale(.75);
+}

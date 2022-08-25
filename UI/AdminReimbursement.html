@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Employee reimbursement page
+    </title>
+    <link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+    <div class="employee-reimbursement-form">
+        <form onsubmit="event.preventDefault();">
+            <div class="form-action-buttons">
+                <label id="remId"></label>
+                <select id="status" name="status">
+                    <option selected>Choose Reimbursement status</option>
+                    <option value="pending">Pending</option>
+                    <option value="approve">Approve</option>
+                    <option value="deny">Deny</option>
+                </select>
+                <input type="submit" onclick="updateReimbursement()" value="Update">
+                <input type="submit" onclick="SearchByStatus()" value="Search">
+            </div>
+        </form>
+    </div>
+    <div class="employees-reimbursement-table">
+        <table class="list" id="reimbursementList">
+            <thead>
+                <tr>
+                    <th>Reimbursement Id</th>
+                    <th>Employee Id</th>
+                    <th>Reason</th>
+                    <th>Amount</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="list">
+
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        //==========================================================================================================
+        var data = JSON.parse(localStorage.getItem('empDetail'));
+        var ourRequest = new XMLHttpRequest();
+
+        ourRequest.open('GET', `http://localhost:8080/ProjectOne/reimbursements`)
+
+        ourRequest.onload = function () {
+            if (ourRequest.status >= 200 && ourRequest.status < 400) {
+
+                var ourData = JSON.parse(ourRequest.responseText);
+
+                buildTable(ourData);
+            } else {
+
+                console.log("We connected to the server, but it returned an error.");
+            }
+        };
+        ourRequest.onerror = function () {
+            console.log("Connection error");
+        };
+
+        ourRequest.send();
+        buildTable(ourRequest)
+
+        function buildTable(data) {
+            var table = document.getElementById("reimbursementList")
+            table.innerHTML = '';
+            for (var i = 0; i < data.length; i++) {
+                var row = `<tr>
+                                <td>${data[i].reimbursementId}</td>
+                                <td>${data[i].employeeId}</td>
+                                <td>${data[i].reason}</td>
+                                <td>${data[i].amount}</td>
+                                <td>${data[i].description}</td>
+                                <td>${data[i].status}</td>
+                                <td><a onClick="onEdit(this)">Edit</a></td>
+                          </tr>`
+                table.innerHTML += row
+            }
+        }
+        //======================================================================================================================
+
+
+        //========================================================================================================================
+        function onEdit(td) {
+            selectedRow = td.parentElement.parentElement;
+            document.getElementById("remId").innerHTML = selectedRow.cells[0].innerHTML;
+            document.getElementById("reason").value = selectedRow.cells[2].innerHTML;
+            document.getElementById("amount").value = selectedRow.cells[3].innerHTML;
+            document.getElementById("description").value = selectedRow.cells[4].innerHTML;
+        }
+
+        async function updateReimbursement() {
+            let reimbursement = {
+                reimbursementId: selectedRow.cells[0].innerHTML,
+                employeeId: selectedRow.cells[1].innerHTML,
+                reason: selectedRow.cells[2].innerHTML,
+                amount: selectedRow.cells[3].innerHTML,
+                description: selectedRow.cells[4].innerHTML,
+                status: document.getElementById("status").value
+            }
+            let url = 'http://localhost:8080/ProjectOne/reimbursements';
+            let response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json; charset=UTF-8'
+                },
+                body: JSON.stringify(reimbursement)
+            });
+
+            if (response.status == 200) {
+                alert("Success!");
+                document.getElementById("remId").innerHTML = "";
+                var ourRequest = new XMLHttpRequest();
+
+                ourRequest.open('GET', `http://localhost:8080/ProjectOne/reimbursements`)
+
+                ourRequest.onload = function () {
+                    if (ourRequest.status >= 200 && ourRequest.status < 400) {
+
+                        var ourData = JSON.parse(ourRequest.responseText);
+
+                        buildTable(ourData);
+                    } else {
+
+                        console.log("We connected to the server, but it returned an error.");
+                    }
+                };
+                ourRequest.onerror = function () {
+                    console.log("Connection error");
+                };
+
+                ourRequest.send();
+                buildTable(response);
+            }
+            else {
+                alert("Access denied! or Something went wrong...");
+            }
+        }
+        //=================================================================================================
+
+        async function SearchByStatus() {
+
+            let status = document.getElementById("status").value;
+            var ourRequest = new XMLHttpRequest();
+
+            ourRequest.open('GET', `http://localhost:8080/ProjectOne/reimbursements?reimbursement_status=${status}`)
+
+            ourRequest.onload = function () {
+
+                if (ourRequest.status >= 200 && ourRequest.status < 400) {
+
+                    var ourData = JSON.parse(ourRequest.responseText);
+
+                    buildTable(ourData);
+                } else {
+                    console.log("We connected to the server, but it returned an error.");
+                }
+            };
+            ourRequest.onerror = function () {
+                console.log("Connection error");
+            };
+            ourRequest.send()
+        }
+
+        function buildTable(data) {
+            var table = document.getElementById("reimbursementList")
+            table.innerHTML = '';
+            for (var i = 0; i < data.length; i++) {
+                var row = `<tr>
+                                <td>${data[i].reimbursementId}</td>
+                                <td>${data[i].employeeId}</td>
+                                <td>${data[i].reason}</td>
+                                <td>${data[i].amount}</td>
+                                <td>${data[i].description}</td>
+                                <td>${data[i].status}</td>
+                                <td><a onClick="onEdit(this)">Edit</a></td>
+                          </tr>`
+                table.innerHTML += row
+            }
+        }
+
+    </script>
+</body>
+
+</html>

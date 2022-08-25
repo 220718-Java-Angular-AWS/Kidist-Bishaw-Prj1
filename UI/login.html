@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="style.css" rel="stylesheet" />
+    <title>Login</title>
+</head>
+
+<body>
+    <div class="container">
+        <form autocomplete="off">
+            <div class="form-row"><input id="email" type="text" name="email" placeholder="Email" /></div>
+            <div class="form-row"><input id="password" type="password" name="password" placeholder="Password" /></div>
+            <div class="form-row">
+                <button id="btn">Login</button>
+            </div>
+            <div class="form-row">
+                <p class="message">Don't have an account?<a href="employee.html">Sign Up</a></p>
+            </div>
+        </form>
+    </div>
+</body>
+<script>
+    const btn = document.getElementById("btn");
+    const request = async function (email, password) {
+
+        try {
+            const resp = await fetch(`http://localhost:8080/ProjectOne/auth?email=${email}&password=${password}`);
+            const data = await resp.json();
+            window.localStorage.setItem('empDetail', JSON.stringify(data));
+            localStorage.setItem("empId", data.employeeId);
+            localStorage.setItem("role", data.role);
+
+            if (data.role == "admin") {
+                //location.replace(`http://localhost:8080/ProjectOne/reimbursements`);
+                //location.replace(`http://localhost:8080/ProjectOne/employees`);
+                location.href = "admin.html";
+            } else {
+                //location.replace(`http://localhost:8080/ProjectOne/reimbursements?emp_id=${data.employeeId}`);
+                location.href = "UserReimbursement.html";
+            }
+
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        const form = e.target.closest('form');
+
+        const formData = new FormData(form);
+        let data = [];
+        for (const [key, value] of formData) {
+            data[key] = value;
+        }
+        var email = document.getElementById("email").value;
+        var password = document.getElementById("password").value;
+
+        request(email, password);
+    });
+
+</script>
+
+</html>
